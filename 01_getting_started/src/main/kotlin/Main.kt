@@ -111,6 +111,7 @@ class CommandText {
             it.redirectError(ProcessBuilder.Redirect.PIPE)
         }
 
+//        https://stackoverflow.com/questions/70655939/java-kotlin-way-to-redirect-command-output-to-both-stdout-and-string
         coroutineScope.launch {
             runCatching {
                 processBuilder.start().also {
