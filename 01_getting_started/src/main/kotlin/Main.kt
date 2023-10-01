@@ -116,6 +116,7 @@ class CommandText {
             runCatching {
                 processBuilder.start().also {
                     this@CommandText.isActive = true
+//                    https://apricottail.com/?P=kotlin_7
                     it.inputStream.bufferedReader(Charset.forName("MS932")).run {
                         while (true) {
                             readLine()?.let { line ->
