@@ -180,15 +180,14 @@ fun MainContent() {
         text = "ping -c 3 8.8.8.8"
     }
 
+    val monoFontFamily = FontFamily(
+        Font("assets/fonts/Myrica.TTC", weight = FontWeight.Normal),
+    )
     MaterialTheme(
         typography = Typography(
-            defaultFontFamily = FontFamily(
-                Font("assets/fonts/Myrica.TTC", weight = FontWeight.Normal),
-            ),
+            defaultFontFamily = monoFontFamily,
             body1 = TextStyle(
-                fontFamily = FontFamily(
-                    Font("assets/fonts/Myrica.TTC", weight = FontWeight.Normal),
-                )
+                fontFamily = monoFontFamily
             )
         ),
     ) {
