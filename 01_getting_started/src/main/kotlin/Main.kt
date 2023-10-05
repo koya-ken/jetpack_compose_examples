@@ -80,9 +80,24 @@ fun App() {
     }
 }
 
+fun windows(block: () -> Unit) {
+    val osName = System.getProperty("os.name")
+    if (osName.lowercase().startsWith("windows")) {
+        block()
+    }
+}
+
+fun linux(block: () -> Unit) {
+    val osName = System.getProperty("os.name")
+    if (osName.lowercase().startsWith("linux")) {
+        block()
+    }
+}
+
 class CommandText {
     var stdout by mutableStateOf("")
     var stderr by mutableStateOf("")
+    var charset by mutableStateOf(Charset.defaultCharset())
 
     private val command = ArrayList<String>()
     private var isActive = false
@@ -111,20 +126,25 @@ class CommandText {
             it.redirectError(ProcessBuilder.Redirect.PIPE)
         }
 
+        windows {
+            charset = Charset.forName("MS932")
+        }
+
 //        https://stackoverflow.com/questions/70655939/java-kotlin-way-to-redirect-command-output-to-both-stdout-and-string
         coroutineScope.launch {
+            println(Thread.currentThread().name)
             runCatching {
                 processBuilder.start().also {
                     this@CommandText.isActive = true
 //                    https://apricottail.com/?P=kotlin_7
-                    it.inputStream.bufferedReader(Charset.forName("MS932")).run {
+                    it.inputStream.bufferedReader(charset).run {
                         while (true) {
                             readLine()?.let { line ->
                                 stdout += "$line\n"
                             } ?: break
                         }
                     }
-                    it.errorStream.bufferedReader(Charset.forName("MS932")).run {
+                    it.errorStream.bufferedReader(charset).run {
                         while (true) {
                             readLine()?.let { line ->
                                 stderr += "$line\n"
@@ -151,15 +171,26 @@ class CommandText {
 @Preview
 fun MainContent() {
     val command = remember { CommandText() }
-    var text by remember { mutableStateOf("ipconfig /all") }
-    MaterialTheme (typography = Typography(
-        defaultFontFamily  = FontFamily(
-            Font("assets/fonts/Myrica.TTC", weight = FontWeight.Normal),
+    var text by remember { mutableStateOf("") }
+
+    windows {
+        text = "ipconfig /all"
+    }
+    linux {
+        text = "ping -c 3 8.8.8.8"
+    }
+
+    MaterialTheme(
+        typography = Typography(
+            defaultFontFamily = FontFamily(
+                Font("assets/fonts/Myrica.TTC", weight = FontWeight.Normal),
+            ),
+            body1 = TextStyle(
+                fontFamily = FontFamily(
+                    Font("assets/fonts/Myrica.TTC", weight = FontWeight.Normal),
+                )
+            )
         ),
-        body1 = TextStyle(fontFamily = FontFamily(
-            Font("assets/fonts/Myrica.TTC", weight = FontWeight.Normal),
-        ))
-    ),
     ) {
         Scaffold(
             topBar = {
